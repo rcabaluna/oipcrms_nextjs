@@ -1,0 +1,90 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model tblusers {
+  userid     Int      @id @default(autoincrement())
+  lastname   String
+  firstname  String
+  middle     String? // Optional
+  extension  String? // Optional
+  position   String
+  group1id   Int? // Optional
+  group2id   Int? // Optional
+  group3id   Int? // Optional
+  is_head    Boolean
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Relations
+  useraccount tbluseraccounts? // One-to-one relationship (only defined on tbluseraccounts)
+  group1      tblgroup1?       @relation(fields: [group1id], references: [group1id])
+  group2      tblgroup2?       @relation(fields: [group2id], references: [group2id])
+  group3      tblgroup3?       @relation(fields: [group3id], references: [group3id])
+}
+
+model tblgroup1 {
+  group1id   Int      @id @default(autoincrement())
+  group1code String
+  group1name String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Relations
+  users     tblusers[] // One group1 can be assigned to many users
+  groups2   tblgroup2[]
+  tblgroup3 tblgroup3[]
+}
+
+model tblgroup2 {
+  group2id   Int      @id @default(autoincrement())
+  group1id   Int
+  group2code String
+  group2name String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Relations
+  group1   tblgroup1   @relation(fields: [group1id], references: [group1id])
+  groups3  tblgroup3[]
+  tblusers tblusers[]
+}
+
+model tblgroup3 {
+  group3id   Int      @id @default(autoincrement())
+  group1id   Int
+  group2id   Int
+  group3code String
+  group3name String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Relations
+  group1   tblgroup1  @relation(fields: [group1id], references: [group1id])
+  group2   tblgroup2  @relation(fields: [group2id], references: [group2id])
+  tblusers tblusers[]
+}
+
+model tbluseraccounts {
+  useraccountid Int      @id @default(autoincrement())
+  userid        Int      @unique
+  username      String   @unique
+  password      String
+  is_active     Boolean
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  // Relation (only defining the reference here)
+  user tblusers @relation(fields: [userid], references: [userid])
+}
