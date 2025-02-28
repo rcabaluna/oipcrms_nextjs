@@ -19,13 +19,22 @@ export const authOptions: NextAuthOptions = {
                     return null;
                 }
 
-                
-                const user = await prisma.tbluseraccounts.findUnique({
+                const user = await prisma.tbluseraccounts.findFirst({
                     where: {
                         username: credentials.username,
-                        is_active: true,
+                        is_active: true, // Ensure active status is checked
+                    },
+                    include: {
+                        user: {
+                            include: {
+                                group1: true,
+                                group2: true,
+                                group3: true,
+                            },
+                        },
                     },
                 });
+                
 
                 if(!user){
                     return null;
@@ -49,7 +58,7 @@ export const authOptions: NextAuthOptions = {
     },
     callbacks: {
         session: ({session, token}) => {
-            console.log('session callback', {session, token});
+           
             return {...session,
                 user: {
                     ...session.user,
@@ -58,13 +67,26 @@ export const authOptions: NextAuthOptions = {
             };
         },
         jwt: ({token, user}) => {
-            console.log('jwt callback', {token, user});
-
             if (user) {
                 const u = user as unknown as any
-                return {...token, ...user};
+                return {
+                    ...token,
+                    useraccountid: u.id.toString(),
+                    userid: u.user.userid.toString(),
+                    username: u.username,
+                    firstname: u.user.firstname,
+                    lastname: u.user.lastname,
+                    middlename: u.user.middlename,
+                    extension: u.user.extension,
+                    position: u.user.position,
+                    group1name: u.user.group1 ? u.user.group1.group1name : null,
+                    group2name: u.user.group2 ? u.user.group2.group2name : null,
+                    group3name: u.user.group3 ? u.user.group3.group3name : null,
+                };
+                
             }
             return token;
+            
         },
     }
 }

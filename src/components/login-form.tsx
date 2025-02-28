@@ -14,7 +14,10 @@ import { Label } from "@/components/ui/label";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 
-export function LoginForm({ className, ...props }: React.ComponentProps<"div">) {
+export function LoginForm({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -78,14 +81,11 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
         </CardContent>
       </Card>
       <div className="text-center text-xs text-muted-foreground">
-        By clicking continue, you agree to our{" "}
+        Developed by{" "}
         <a href="#" className="underline hover:text-primary">
-          Terms of Service
+          DOST 10
         </a>{" "}
-        and{" "}
-        <a href="#" className="underline hover:text-primary">
-          Privacy Policy
-        </a>.
+        MIS Unit .
       </div>
     </div>
   );

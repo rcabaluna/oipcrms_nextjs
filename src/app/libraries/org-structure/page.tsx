@@ -15,7 +15,7 @@ const Content = async () => {
   );
 };
 
-const UsersPage = () => {
+const OrgStructure = () => {
   return (
     <MainSidebar>
       <Content />
@@ -23,4 +23,4 @@ const UsersPage = () => {
   );
 };
 
-export default UsersPage;
+export default OrgStructure;
