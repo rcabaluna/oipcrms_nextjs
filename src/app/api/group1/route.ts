@@ -3,15 +3,9 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
     try {
-        const users = await prisma.tblusers.findMany({
-            include: {
-                group1:true,
-                group2: true,
-                group3: true
-            }
-        });
+        const group1 = prisma.tblgroup1.findMany();
 
-        return NextResponse.json(users);
+        return NextResponse.json(group1);
     } catch (error) {
         console.error("Error fetching users", error);
         return NextResponse.json(

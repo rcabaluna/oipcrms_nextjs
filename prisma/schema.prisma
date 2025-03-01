@@ -17,7 +17,7 @@ model tblusers {
   userid     Int      @id @default(autoincrement())
   lastname   String
   firstname  String
-  middle     String? // Optional
+  middlename String? // Optional
   extension  String? // Optional
   position   String
   group1id   Int? // Optional
