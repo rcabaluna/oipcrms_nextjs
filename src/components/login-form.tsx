@@ -35,7 +35,7 @@ export function LoginForm({
     if (result?.error) {
       setError("Invalid username or password");
     } else {
-      window.location.href = "/libraries/users"; // Redirect after login
+      window.location.href = "/libraries/org-structure"; // Redirect after login
     }
   };
 

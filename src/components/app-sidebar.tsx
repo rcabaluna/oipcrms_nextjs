@@ -15,7 +15,6 @@ import {
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
-import { NavProjects } from "@/components/nav-projects";
 import { NavUser } from "@/components/nav-user";
 import { TeamSwitcher } from "@/components/team-switcher";
 import {
@@ -27,7 +26,6 @@ import {
 } from "@/components/ui/sidebar";
 import { Session } from "next-auth";
 
-// This is sample data.
 const data = {
   teams: [
     {
