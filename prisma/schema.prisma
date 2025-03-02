@@ -24,6 +24,7 @@ model tblusers {
   group2id   Int? // Optional
   group3id   Int? // Optional
   is_head    Boolean
+  is_deleted Boolean @default(false)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
@@ -44,7 +45,7 @@ model tblgroup1 {
   // Relations
   users     tblusers[] // One group1 can be assigned to many users
   groups2   tblgroup2[]
-  tblgroup3 tblgroup3[]
+  groups3   tblgroup3[]
 }
 
 model tblgroup2 {
@@ -82,6 +83,7 @@ model tbluseraccounts {
   username      String   @unique
   password      String
   is_active     Boolean
+  is_deleted    Boolean @default(false)
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt
 

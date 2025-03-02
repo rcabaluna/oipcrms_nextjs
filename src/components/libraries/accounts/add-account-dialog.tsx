@@ -3,155 +3,203 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+	Dialog,
+	DialogContent,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useRouter } from "next/navigation";
 
+// Define the User interface to specify the structure of user data
 interface User {
-  userid: number;
-  firstname: string;
-  middlename?: string;
-  lastname: string;
-  extension?: string;
+	userid: number;
+	firstname: string;
+	middlename?: string;
+	lastname: string;
+	extension?: string;
 }
 
+// Component for adding a new user account
 export default function AddAccountDialog({ users }: { users: User[] }) {
-  const [selectedUser, setSelectedUser] = useState<number | undefined>(undefined); // Ensure it's a number
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [isActive, setIsActive] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
+	// State to manage dialog visibility
+	const [isOpen, setIsOpen] = useState(false);
 
-  async function submitAccount(e: React.FormEvent) {
-    e.preventDefault();
+	// State to manage form data
+	const [formData, setFormData] = useState({
+		userid: "",
+		username: "",
+		password: "",
+		isActive: true,
+	});
 
-    if (selectedUser === undefined || !username || !password) {
-      alert("Please fill in all required fields.");
-      return;
-    }
+	// State to manage loading state during form submission
+	const [isLoading, setIsLoading] = useState(false);
 
-    const formData = {
-      userid: selectedUser, // Now correctly stored as a number
-      username,
-      password,
-      is_active: isActive,
-    };
+	// Router instance to refresh the page after form submission
+	const router = useRouter();
 
-    try {
-      setIsLoading(true);
-      const response = await fetch("/api/accounts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+	// Function to handle input changes and update state
+	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+		setFormData({ ...formData, [e.target.name]: e.target.value });
 
-      if (!response.ok) throw new Error(await response.text());
+	// Function to handle form submission
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault(); // Prevent default form submission behavior
 
-      alert("Account created successfully!");
-      setSelectedUser(undefined);
-      setUsername("");
-      setPassword("");
-      setIsActive(true);
-    } catch (error) {
-      console.error("Error submitting account:", error);
-      alert("Failed to create account. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  }
+		// Validation: Ensure all required fields are filled
+		if (!formData.userid || !formData.username || !formData.password) {
+			alert("Please fill in all fields.");
+			return;
+		}
 
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline">Add New Account</Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Add New Account</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={submitAccount}>
-          <div className="grid gap-4 py-4">
-            {/* User Selection */}
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label className="text-right">Name</Label>
-              <Select
-                onValueChange={(value) => setSelectedUser(Number(value))} // Ensure conversion to number
-                value={selectedUser !== undefined ? String(selectedUser) : undefined}
-              >
-                <SelectTrigger className="col-span-3">
-                  <SelectValue placeholder="Select a user" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    {users.map((user) => {
-                      const middleInitial = user.middlename ? `${user.middlename.charAt(0)}.` : "";
-                      const fullName = `${user.firstname} ${middleInitial} ${user.lastname} ${user.extension ?? ""}`.trim();
+		try {
+			setIsLoading(true); // Show loading state
 
-                      return (
-                        <SelectItem key={user.userid} value={String(user.userid)}>
-                          {fullName}
-                        </SelectItem>
-                      );
-                    })}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
+			// Send a POST request to the API to create a new account
+			const res = await fetch("/api/accounts", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					...formData,
+					userid: Number(formData.userid), // Ensure userid is a number
+				}),
+			});
 
-            {/* Username Input */}
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label className="text-right">Username</Label>
-              <Input
-                id="username"
-                className="col-span-3"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-              />
-            </div>
+			// Check if the request was successful
+			if (!res.ok) throw new Error(await res.text());
 
-            {/* Password Input */}
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label className="text-right">Password</Label>
-              <Input
-                id="password"
-                className="col-span-3"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
+			// Reset form fields after successful submission
+			setFormData({
+				userid: "",
+				username: "",
+				password: "",
+				isActive: true,
+			});
 
-            {/* Is Active Checkbox */}
-            <div className="flex items-center gap-2">
-              <Checkbox id="isActive" checked={isActive} onCheckedChange={(checked) => setIsActive(checked === true)} />
-              <Label htmlFor="isActive">Is Active</Label>
-            </div>
-          </div>
+			router.refresh(); // Refresh the page to update the user list
+			setIsOpen(false); // Close the dialog
+		} catch (error) {
+			alert("Failed to create account."); // Show error message
+		} finally {
+			setIsLoading(false); // Hide loading state
+		}
+	};
 
-          <DialogFooter>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Submitting..." : "Submit"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
-  );
+	return (
+		// Dialog component to show the form inside a modal
+		<Dialog open={isOpen} onOpenChange={setIsOpen}>
+			{/* Button to trigger the dialog */}
+			<DialogTrigger asChild>
+				<Button variant="outline" onClick={() => setIsOpen(true)}>
+					Add New Account
+				</Button>
+			</DialogTrigger>
+
+			{/* Dialog content */}
+			<DialogContent className="sm:max-w-[425px]">
+				<DialogHeader>
+					<DialogTitle>Add New Account</DialogTitle>
+				</DialogHeader>
+
+				{/* Form inside the dialog */}
+				<form onSubmit={handleSubmit} className="grid gap-4 py-4">
+					{/* Dropdown for selecting a user */}
+					<div className="grid grid-cols-4 items-center gap-4">
+						<Label className="text-right">Name</Label>
+						<Select
+							onValueChange={(value) =>
+								setFormData({ ...formData, userid: value })
+							}
+							value={formData.userid}
+						>
+							<SelectTrigger className="col-span-3">
+								<SelectValue placeholder="Select a user" />
+							</SelectTrigger>
+							<SelectContent>
+								{users.map(
+									({
+										userid,
+										firstname,
+										middlename,
+										lastname,
+										extension,
+									}) => (
+										<SelectItem
+											key={userid}
+											value={String(userid)}
+										>
+											{`${firstname} ${
+												middlename
+													? middlename[0] + "."
+													: ""
+											} ${lastname} ${
+												extension || ""
+											}`.trim()}
+										</SelectItem>
+									)
+								)}
+							</SelectContent>
+						</Select>
+					</div>
+
+					{/* Input field for Username */}
+					<div className="grid grid-cols-4 items-center gap-4">
+						<Label className="text-right">Username</Label>
+						<Input
+							name="username"
+							className="col-span-3"
+							value={formData.username}
+							onChange={handleChange}
+						/>
+					</div>
+
+					{/* Input field for Password */}
+					<div className="grid grid-cols-4 items-center gap-4">
+						<Label className="text-right">Password</Label>
+						<Input
+							name="password"
+							type="password"
+							className="col-span-3"
+							value={formData.password}
+							onChange={handleChange}
+						/>
+					</div>
+
+					{/* Checkbox to mark the account as active or inactive */}
+					<div className="flex items-center gap-2">
+						<Checkbox
+							id="isActive"
+							checked={formData.isActive}
+							onCheckedChange={(checked) =>
+								setFormData({
+									...formData,
+									isActive: !!checked,
+								})
+							}
+						/>
+						<Label htmlFor="isActive">Is Active</Label>
+					</div>
+
+					{/* Submit button */}
+					<DialogFooter>
+						<Button type="submit" disabled={isLoading}>
+							{isLoading ? "Submitting..." : "Submit"}
+						</Button>
+					</DialogFooter>
+				</form>
+			</DialogContent>
+		</Dialog>
+	);
 }

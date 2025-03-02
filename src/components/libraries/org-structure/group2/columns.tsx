@@ -15,31 +15,23 @@ import {
 import { DataTableColumnHeader } from "@/components/data-table-options/dt-col-header";
 import { Checkbox } from "@/components/ui/checkbox";
 
-export type AccountsCol = {
-	useraccountid: number;
-	userid: number;
-	username: string;
-	password: string;
-	is_active: boolean;
+export type Group2Cols = {
+	group2id: number;
+	group1id: number;
+	group2code: string;
+	group2name: string;
 	created_at: string;
 	updated_at: string;
-	user: {
-		userid: number;
-		lastname: string;
-		firstname: string;
-		middlename: string;
-		extension: string | null;
-		position: string;
-		group1id: number | null;
-		group2id: number | null;
-		group3id: number | null;
-		is_head: boolean;
+	group1: {
+		group1id: number;
+		group1code: string;
+		group1name: string;
 		created_at: string;
 		updated_at: string;
 	};
 };
 
-export const columns: ColumnDef<AccountsCol>[] = [
+export const columns: ColumnDef<Group2Cols>[] = [
 	{
 		id: "select",
 		header: ({ table }) => (
@@ -63,46 +55,31 @@ export const columns: ColumnDef<AccountsCol>[] = [
 		),
 	},
 	{
-		id: "no",
-		header: "No.",
-		cell: ({ row }) => row.index + 1,
-	},
-	{
-		accessorKey: "name",
+		accessorKey: "group1name",
 		header: ({ column }) => (
-			<DataTableColumnHeader column={column} title="Name" />
+			<DataTableColumnHeader column={column} title="Office Name" />
 		),
 		cell: ({ row }) => {
-			const user = row.original.user;
-			const middleInitial = user?.middlename
-				? `${user?.middlename.charAt(0)}.`
-				: "";
-			const fullName = `${user?.firstname || ""} ${middleInitial || ""} ${
-				user?.lastname || ""
-			} ${user?.extension || ""}`.trim();
-			return <div>{fullName}</div>;
+			const group = row.original;
+			return <>{group.group1?.group1name}</>;
 		},
 	},
 	{
-		accessorKey: "username",
+		accessorKey: "group2name",
 		header: ({ column }) => (
-			<DataTableColumnHeader column={column} title="Username" />
+			<DataTableColumnHeader column={column} title="Division Name" />
 		),
 	},
 	{
-		accessorKey: "is_active",
+		accessorKey: "group2code",
 		header: ({ column }) => (
-			<DataTableColumnHeader column={column} title="Status" />
+			<DataTableColumnHeader column={column} title="Division Code" />
 		),
-		cell: ({ row }) => {
-			const isActive = row.getValue("is_active");
-			return <div>{isActive ? "Active" : "Inactive"}</div>;
-		},
 	},
 	{
 		id: "actions",
 		cell: ({ row }) => {
-			const user = row.original;
+			const group = row.original;
 			return (
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>

@@ -15,31 +15,17 @@ import {
 import { DataTableColumnHeader } from "@/components/data-table-options/dt-col-header";
 import { Checkbox } from "@/components/ui/checkbox";
 
-export type AccountsCol = {
-	useraccountid: number;
+export type UsersCols = {
 	userid: number;
-	username: string;
-	password: string;
-	is_active: boolean;
-	created_at: string;
-	updated_at: string;
-	user: {
-		userid: number;
-		lastname: string;
-		firstname: string;
-		middlename: string;
-		extension: string | null;
-		position: string;
-		group1id: number | null;
-		group2id: number | null;
-		group3id: number | null;
-		is_head: boolean;
-		created_at: string;
-		updated_at: string;
-	};
+	name: String;
+	position: String;
+	group1name: String;
+	group2name: String;
+	group3name: String;
+	is_head: Boolean;
 };
 
-export const columns: ColumnDef<AccountsCol>[] = [
+export const columns: ColumnDef<UsersCols>[] = [
 	{
 		id: "select",
 		header: ({ table }) => (
@@ -63,41 +49,16 @@ export const columns: ColumnDef<AccountsCol>[] = [
 		),
 	},
 	{
-		id: "no",
-		header: "No.",
-		cell: ({ row }) => row.index + 1,
-	},
-	{
-		accessorKey: "name",
+		accessorKey: "group1name",
 		header: ({ column }) => (
-			<DataTableColumnHeader column={column} title="Name" />
-		),
-		cell: ({ row }) => {
-			const user = row.original.user;
-			const middleInitial = user?.middlename
-				? `${user?.middlename.charAt(0)}.`
-				: "";
-			const fullName = `${user?.firstname || ""} ${middleInitial || ""} ${
-				user?.lastname || ""
-			} ${user?.extension || ""}`.trim();
-			return <div>{fullName}</div>;
-		},
-	},
-	{
-		accessorKey: "username",
-		header: ({ column }) => (
-			<DataTableColumnHeader column={column} title="Username" />
+			<DataTableColumnHeader column={column} title="Office Name" />
 		),
 	},
 	{
-		accessorKey: "is_active",
+		accessorKey: "group1code",
 		header: ({ column }) => (
-			<DataTableColumnHeader column={column} title="Status" />
+			<DataTableColumnHeader column={column} title="Office Code" />
 		),
-		cell: ({ row }) => {
-			const isActive = row.getValue("is_active");
-			return <div>{isActive ? "Active" : "Inactive"}</div>;
-		},
 	},
 	{
 		id: "actions",
